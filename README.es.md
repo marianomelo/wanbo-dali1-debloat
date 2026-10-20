@@ -74,6 +74,33 @@ Necesitas `adb`, `curl` y `python3` en un computador conectado a la misma red.
    inicio y desactiva el launcher de Wanbo.
 4. `adb reboot`.
 
+## Sin el script (Windows, macOS, Linux)
+
+`apply.sh` necesita bash. Sin él, los mismos pasos se hacen con comandos `adb` sueltos en
+cualquier sistema operativo. En Windows, `adb` viene en
+[Platform Tools](https://developer.android.com/tools/releases/platform-tools) o en la carpeta de
+scrcpy.
+
+1. **Conectar:** `adb connect <ip>:5555`
+2. **Instalar Projectivy Launcher:**
+   `adb shell am start -a android.intent.action.VIEW -d market://details?id=com.spocky.projengmenu`,
+   presionar Instalar en el proyector y completar la bienvenida con el control. Después:
+   `adb shell cmd package set-home-activity com.spocky.projengmenu/.ui.home.MainActivity`.
+   Confirma que el botón Home abre Projectivy **antes** de desactivar el launcher de Wanbo.
+3. **Instalar SmartTube:** bajar `SmartTube_stable_<versión>_armeabi-v7a.apk` desde
+   [sus versiones](https://github.com/yuliskov/SmartTube/releases/latest) y correr `adb install <apk>`.
+4. **Desactivar** cada paquete de [packages/disabled.txt](packages/disabled.txt), salvo los que
+   uses: `adb shell pm disable-user --user 0 <paquete>`
+5. **Detener las 3 apps que arrancan igual:** `adb shell pm uninstall -k --user 0 <paquete>` para
+   `com.sdt.factorytest`, `com.kystar.middleware.track` y
+   `com.zeasn.deviceportal.asdprovider.kystar_hisi352`.
+6. **Ocultar el YouTube oficial:** `adb shell pm hide com.google.android.youtube.tv`
+7. **Quitar el rastreador, apagar las animaciones y vaciar la caché:**
+   `adb shell settings delete secure enabled_accessibility_services`, luego
+   `adb shell settings put global <clave> 0` para `window_animation_scale`,
+   `transition_animation_scale` y `animator_duration_scale`, y por último
+   `adb shell pm trim-caches 999G` y `adb reboot`.
+
 Qué se cambia, cómo revertirlo, cómo ver la pantalla con scrcpy y cómo resolver problemas está en
 el [README en inglés](README.md); los comandos son los mismos. Si usas duplicar pantalla, el
 reproductor de pendrive o el modo parlante, saca esas líneas de `packages/disabled.txt` antes de

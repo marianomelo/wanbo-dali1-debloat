@@ -71,6 +71,54 @@ You need `adb`, `curl` and `python3` on a computer on the same network.
    Home app and disables the Wanbo launcher.
 4. `adb reboot`.
 
+## Manual way (Windows, macOS, Linux)
+
+`apply.sh` needs bash. Without it, the same steps work as plain `adb` commands on any OS. On
+Windows, get `adb` from [Platform Tools](https://developer.android.com/tools/releases/platform-tools)
+or use the `adb.exe` bundled with scrcpy, and run these in a terminal from that folder.
+
+1. **Connect:** `adb connect <ip>:5555`
+2. **Install Projectivy Launcher.** Open its Play Store page on the projector and press Install:
+   ```
+   adb shell am start -a android.intent.action.VIEW -d market://details?id=com.spocky.projengmenu
+   ```
+   Finish its welcome wizard with the remote, then make it the Home app:
+   ```
+   adb shell cmd package set-home-activity com.spocky.projengmenu/.ui.home.MainActivity
+   ```
+   Press Home on the remote and check that Projectivy shows up **before** disabling the Wanbo
+   launcher in the next step.
+3. **Install SmartTube.** Download `SmartTube_stable_<version>_armeabi-v7a.apk` from
+   [its releases](https://github.com/yuliskov/SmartTube/releases/latest), then:
+   ```
+   adb install SmartTube_stable_<version>_armeabi-v7a.apk
+   ```
+4. **Disable** each package in [packages/disabled.txt](packages/disabled.txt) (skip the ones you
+   use):
+   ```
+   adb shell pm disable-user --user 0 <package>
+   ```
+5. **Stop the three apps that restart anyway** (they stay in `/system` and can be restored):
+   ```
+   adb shell pm uninstall -k --user 0 com.sdt.factorytest
+   adb shell pm uninstall -k --user 0 com.kystar.middleware.track
+   adb shell pm uninstall -k --user 0 com.zeasn.deviceportal.asdprovider.kystar_hisi352
+   ```
+6. **Hide the official YouTube** so Play Store can't bring it back:
+   `adb shell pm hide com.google.android.youtube.tv`
+7. **Remove the tracking accessibility service, turn off animations and clear caches:**
+   ```
+   adb shell settings delete secure enabled_accessibility_services
+   adb shell settings put global window_animation_scale 0
+   adb shell settings put global transition_animation_scale 0
+   adb shell settings put global animator_duration_scale 0
+   adb shell pm trim-caches 999G
+   adb reboot
+   ```
+
+Check the result with `adb shell pm list packages -d` (lists what's disabled). Any step can be
+undone (see Revert).
+
 ## What gets changed
 
 **Disabled** (`pm disable-user --user 0`, list in [packages/disabled.txt](packages/disabled.txt)):
