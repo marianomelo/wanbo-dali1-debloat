@@ -1,0 +1,7 @@
+com.amazon.amazonvideo.livingroom
+com.amazon.avod.thirdpartyclient
+com.android.chrome
+com.disney.disneyplus
+com.google.android.youtube.tv
+com.netflix.mediaclient
+com.wbd.stream
